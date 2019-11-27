@@ -1,14 +1,15 @@
 window.addEventListener("load", initScene);
+
+
+var shader = ShaderLoader.getShaders("js/shaders/basic.vert","js/shaders/basic.frag");
 console.log("Shader Loaded");
-
-var shader = ShaderLoader.getShaders("shaders/basic.vert","shaders/basic.frag");
-
 
 //var setups
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,  0.1, 1000);
 var renderer = new THREE.WebGLRenderer({antilias: true});
 var gemometry = new THREE.BoxGeometry(1,1,1);
+
 var material = new THREE.ShaderMaterial(
 {
     uniforms:{},
