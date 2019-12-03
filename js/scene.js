@@ -10,13 +10,20 @@ console.log("Shader Loaded");
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,  0.1, 1000);
 var renderer = new THREE.WebGLRenderer({antilias: true});
-var gemometry = new THREE.PlaneGeometry(10,10,25,25);
+var gemometry = new THREE.PlaneGeometry(100,100,25,25);
 var controls = new THREE.OrbitControls( camera, renderer.domElement );
 var clock = new THREE.Clock();
 var time;
+
+var rain = new Rain(500);
+
+
+
+
+
+
+
 var texture = new THREE.TextureLoader().load("wave.png");
-
-
 var waveMaterial = new THREE.ShaderMaterial(
 {
     uniforms:
@@ -35,15 +42,17 @@ var sea = new THREE.Mesh(gemometry, waveMaterial);
 
 function initScene()
 {
+    //set up rendere and controls
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
+    //add objects and add to scene
     sea = new THREE.Mesh(gemometry, waveMaterial);
+    rain = new THREE.Points(rain.rainGeo,rain.rainMaterial);
+    scene.add(rain);
     scene.add(sea);
     
-    
-   
 
     camera.position.z = 5;
     addLighting();
@@ -64,7 +73,7 @@ function addLighting()
 var x = 0;
 function update()
 {
-    
+    rain.updateRain();
     waveMaterial.uniforms.time.value = x;
     renderer.render(scene, camera);
     controls.update();
