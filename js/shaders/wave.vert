@@ -1,5 +1,5 @@
-float waveWidth = 3.0;
-float waveHeight = 0.04;
+float waveWidth = 0.5;
+float waveHeight = 0.4;
 float speed = 1.0;
 uniform float time;
 varying float ftime;
@@ -10,8 +10,8 @@ varying vec2 vUv;
 void main()
 {
     vUv = uv;
-    ftime = time;
     float t = time * speed;
+    ftime = time;
     vec4 v = vec4(position, 1.0);
 
     

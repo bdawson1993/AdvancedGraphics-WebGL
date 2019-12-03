@@ -1,44 +1,49 @@
-
-
-
 window.addEventListener("load", initScene);
 
-var shader = ShaderLoader.getShaders("js/shaders/wave.vert","js/shaders/wave.frag");
+//load shaders
+var waveShader = ShaderLoader.getShaders("js/shaders/wave.vert","js/shaders/wave.frag");
+var basicShader = ShaderLoader.getShaders("js/shaders/basic.vert", "js/shaders/basic.frag");
 console.log("Shader Loaded");
 
 //var setups
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,  0.1, 1000);
 var renderer = new THREE.WebGLRenderer({antilias: true});
-var gemometry = new THREE.PlaneGeometry(100,100,25,25);
+var gemometry = new THREE.PlaneGeometry(10,10,10,10);
 var controls = new THREE.OrbitControls( camera, renderer.domElement );
 var clock = new THREE.Clock();
-var time;
-
+var objLoader = new THREE.OBJLoader();
 var rain = new Rain(500);
 
-
-
-
-
-
-
+//setup texture to repeat
 var texture = new THREE.TextureLoader().load("wave.png");
+texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+texture.repeat.set( 5, 5 );
+
+
+//setup materials
 var waveMaterial = new THREE.ShaderMaterial(
 {
     uniforms:
     { 
         "time": { type:"f", value: clock.getDelta() },
         "texture": {type:"t", value: texture },
+        "xCoord" : {type: "f", value: 0},
     },
-    vertexShader: shader.vertex,
-    fragmentShader: shader.fragment
+    vertexShader: waveShader.vertex,
+    fragmentShader: waveShader.fragment
 });
 
+var baseMaterial = new THREE.ShaderMaterial(
+    {
+        uniforms:
+        {         },
+        vertexShader: basicShader.vertex,
+        fragmentShader: basicShader.fragment
+    });
 
-
-var cubeArray = [];
 var sea = new THREE.Mesh(gemometry, waveMaterial);
+var cloud = new THREE.Mesh();
 
 function initScene()
 {
@@ -49,8 +54,23 @@ function initScene()
 
     //add objects and add to scene
     sea = new THREE.Mesh(gemometry, waveMaterial);
-    rain = new THREE.Points(rain.rainGeo,rain.rainMaterial);
-    scene.add(rain);
+    raino = new THREE.Points(rain.rainGeo,rain.rainMaterial);
+    objLoader.load("cloud.obj", function(loadedObj)
+    {
+        loadedObj.traverse(function(child)
+        {
+            if(child instanceof THREE.Mesh)
+                child.material = baseMaterial;
+        });
+
+        cloud = loadedObj;
+        loadedObj.position.z = 8;
+        loadedObj.scale.set(5,5,5);
+        scene.add(loadedObj);
+    });
+
+    
+    scene.add(raino);
     scene.add(sea);
     
 
@@ -70,13 +90,19 @@ function addLighting()
     scene.add(ambientLight);
 }
 
-var x = 0;
+var time = 0;
+var xCoord = 0;
 function update()
 {
     rain.updateRain();
-    waveMaterial.uniforms.time.value = x;
+    waveMaterial.uniforms.time.value = time;
+    waveMaterial.uniforms.xCoord.value = xCoord;
+
+    cloud.rotation.z += 0.01;
+
     renderer.render(scene, camera);
     controls.update();
-    x += clock.getDelta();
+    time += clock.getDelta();
+    xCoord+= 0.01;
     requestAnimationFrame(update);
 }
