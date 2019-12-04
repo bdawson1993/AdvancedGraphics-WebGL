@@ -25,18 +25,22 @@ class Rain{
         {
             p.update();          
         });
+
+        this.collisionChecks();
     }
 
     collisionChecks()
     {
-        for(i = 0; i < this.drops.length; i++)
+        for(var i = 0; i < this.drops.length; i++)
         {
-            for(y = 0; y < this.drops.length;y++)
+            for(var y = 0; y < this.drops.length;y++)
             {
                 if(i == y) //don't check agaisnt self
                     continue;
 
-                if((this.drops[i].posistion.distanceTo(this.drops[y])) < 0.5)
+                var dist = this.drops[i].posistion.distanceTo(this.drops[y].posistion);
+                //console.log(dist);
+                if(dist < 0.4)
                 {
                     this.drops[i].collide();
                     this.drops[y].collide();
@@ -58,7 +62,7 @@ class DropLet
         this.velocity = new THREE.Vector3(0,0, 0.01 + Math.random() * 0.01);
         this.dropGeo = new THREE.Geometry();
         this.dropMaterial = new THREE.PointsMaterial({
-            color: new THREE.Color('skyblue'),
+            color: new THREE.Color('blue'),
             size: 0.01,
             transparent: true});
         
@@ -83,12 +87,15 @@ class DropLet
         if(this.posistion.z < 0)
         {
             this.posistion.z = 10;
+            this.dropMaterial.size = 0.01
+            this.velocity = new THREE.Vector3(0,0, 0.01 + Math.random() * 0.01);
         }
     }
 
     collide()
     {
-        this.dropMaterial.uniforms.size++;
+        this.dropMaterial.size = 0.08;
+        this.velocity.add(new THREE.Vector3(0,0, 0.001))
     }
 
 
