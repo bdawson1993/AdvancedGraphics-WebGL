@@ -1,49 +1,101 @@
 
 
 class Rain{
-    constructor(rainCount)
+    constructor(rainCount, scene)
     {
-        this.velocity = 0.001 + Math.random() * 0.001;
-        this.rainDrop = new THREE.Vector3();
-        this.rainGeo = new THREE.Geometry();
-        this.rainMaterial = new THREE.PointsMaterial({
-            color: 0xaaaaaa,
-            size: 0.01,
-            transparent: true});
+        this.drops = [];
 
             for(let i = 0; i<rainCount; i++)
             {
-                this.rainDrop = new THREE.Vector3( 
+                let pos = new THREE.Vector3(
                 Math.random() * 10 - 5,
                 Math.random() * 10 - 5,
-                Math.random() * 15
-            );
+                Math.random() * 15);
+                var rainDrop = new DropLet(scene, pos);
 
-            this.rainDrop.velocity = {};
-            this.rainDrop.velocity = 0;
-            this.rainGeo.vertices.push(this.rainDrop);
-        }   
+                //add object
+                this.drops.push(rainDrop);
+            }
 
-    }
+    }   
 
-    updateRain()
+    update()
     {
-        this.rainGeo.vertices.forEach(p => 
+        this.drops.forEach(p => 
         {
-            p.velocity -= this.velocity;
-            p.z += p.velocity;
-            if (p.z < 0) {
-                p.z = 10;
-                p.velocity = 0;
-            }           
-          });
-          this.rainGeo.verticesNeedUpdate = true;
-          return true;
+            p.update();          
+        });
     }
+
+    collisionChecks()
+    {
+        for(i = 0; i < this.drops.length; i++)
+        {
+            for(y = 0; y < this.drops.length;y++)
+            {
+                if(i == y) //don't check agaisnt self
+                    continue;
+
+                if((this.drops[i].posistion.distanceTo(this.drops[y])) < 0.5)
+                {
+                    this.drops[i].collide();
+                    this.drops[y].collide();
+                }
+
+                
+            }
+        }
+    }
+
+}
+
+
+class DropLet
+{
+    constructor(scene, pos)
+    {
+        
+        this.velocity = new THREE.Vector3(0,0, 0.01 + Math.random() * 0.01);
+        this.dropGeo = new THREE.Geometry();
+        this.dropMaterial = new THREE.PointsMaterial({
+            color: new THREE.Color('skyblue'),
+            size: 0.01,
+            transparent: true});
+        
+        this.posistion = pos; 
+        this.dropGeo.vertices.push(pos);
+        
+        this.dropletPoint = new THREE.Points(this.dropGeo, this.dropMaterial);
+
+
+        scene.add(this.dropletPoint);
+        
+    }
+
+
+    update() 
+    {
+        this.posistion = this.posistion.sub(this.velocity);
+        this.dropletPoint.geometry.vertices[0] = this.posistion;
+        this.dropletPoint.geometry.verticesNeedUpdate = true;
+        this.dropletPoint.geometry.computeBoundingSphere();
+
+        if(this.posistion.z < 0)
+        {
+            this.posistion.z = 10;
+        }
+    }
+
+    collide()
+    {
+        this.dropMaterial.uniforms.size++;
+    }
+
 
 
 }
 
-function updateRain(){};
+function update(){};
+
 
 

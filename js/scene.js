@@ -13,7 +13,7 @@ var gemometry = new THREE.PlaneGeometry(10,10,10,10);
 var controls = new THREE.OrbitControls( camera, renderer.domElement );
 var clock = new THREE.Clock();
 var objLoader = new THREE.OBJLoader();
-var rain = new Rain(500);
+var rain;
 
 //setup texture to repeat
 var texture = new THREE.TextureLoader().load("wave.png");
@@ -51,10 +51,10 @@ function initScene()
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     controls = new THREE.OrbitControls( camera, renderer.domElement );
+    rain = new Rain(500, scene)
 
     //add objects and add to scene
     sea = new THREE.Mesh(gemometry, waveMaterial);
-    raino = new THREE.Points(rain.rainGeo,rain.rainMaterial);
     objLoader.load("cloud.obj", function(loadedObj)
     {
         loadedObj.traverse(function(child)
@@ -69,8 +69,6 @@ function initScene()
         scene.add(loadedObj);
     });
 
-    
-    scene.add(raino);
     scene.add(sea);
     
 
@@ -94,7 +92,7 @@ var time = 0;
 var xCoord = 0;
 function update()
 {
-    rain.updateRain();
+    rain.update();
     waveMaterial.uniforms.time.value = time;
     waveMaterial.uniforms.xCoord.value = xCoord;
 
