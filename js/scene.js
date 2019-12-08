@@ -44,6 +44,8 @@ var baseMaterial = new THREE.ShaderMaterial(
 
 var sea = new THREE.Mesh(gemometry, waveMaterial);
 var cloud = new THREE.Mesh();
+var plane = new THREE.Mesh();
+var boat = new THREE.Mesh();
 
 function initScene()
 {
@@ -53,7 +55,7 @@ function initScene()
     controls = new THREE.OrbitControls( camera, renderer.domElement );
     rain = new Rain(500, scene)
 
-    //add objects and add to scene
+    //load cloud
     sea = new THREE.Mesh(gemometry, waveMaterial);
     objLoader.load("cloud.obj", function(loadedObj)
     {
@@ -66,6 +68,38 @@ function initScene()
         cloud = loadedObj;
         loadedObj.position.z = 8;
         loadedObj.scale.set(5,5,5);
+        scene.add(loadedObj);
+    });
+
+    //load [plane]
+    objLoader.load("plane.obj", function(loadedObj)
+    {
+        loadedObj.traverse(function(child)
+        {
+            if(child instanceof THREE.Mesh)
+                child.material = baseMaterial;
+        });
+
+        plane = loadedObj;
+        plane.position.z = 2.5;
+        plane.rotation.x = 90;
+        scene.add(loadedObj);
+    });
+
+
+    //load boat
+    objLoader.load("boat.obj", function(loadedObj)
+    {
+        loadedObj.traverse(function(child)
+        {
+            if(child instanceof THREE.Mesh)
+                child.material = baseMaterial;
+        });
+
+        boat = loadedObj;
+        loadedObj.rotation.x = -30;
+        loadedObj.position.z = 0.3;
+        loadedObj.scale.set(0.5,0.5,0.5);
         scene.add(loadedObj);
     });
 
